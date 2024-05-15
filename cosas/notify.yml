@@ -1,0 +1,14 @@
+#Por linea de codigo puedes poner este
+ansible linux -m shell -a 'notify-send "Holaaaaaa"'ca
+---
+- name: Send desktop notification
+  hosts: all
+
+  tasks:
+    - name: Send notification
+      command: notify-send "Antonio esta a 5km de ti quiere conocerte"
+
+  handlers:
+    - name: Display notification
+      debug:
+        msg: "Notification: {{ notify_msg }}"

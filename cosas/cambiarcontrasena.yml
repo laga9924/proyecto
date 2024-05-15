@@ -1,0 +1,16 @@
+- name: Cambiar contraseña
+  hosts: all
+  become: yes
+  vars_prompt:
+    - name: username
+      prompt: "Introduce el nombre del usuario al que cambiar la contraseña"
+      private: no
+    - name: password
+      prompt: "Introduce la contraseña nueva del usuario"
+      private: yes
+
+  tasks:
+    - name: Cambio de contraseña
+      user:
+        name: "{{ username }}"
+        password: "{{ password | password_hash('sha512') }}"

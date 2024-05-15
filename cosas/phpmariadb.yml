@@ -1,0 +1,22 @@
+---
+- hosts: all  
+  become: true 
+
+  tasks:
+    - name: Instalar MariaDB
+      apt:
+        name: mariadb-server
+        state: latest
+
+    - name: Instalar PHP
+      apt:
+        name:
+          - php
+          - php-mysqli
+          - php-common
+          - php-gd
+          - php-cli
+          - php-mbstring
+          - php-xml
+          - php-json
+        state: latest

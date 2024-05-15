@@ -1,0 +1,23 @@
+---
+- name: Crear archivo de texto y añadir texto
+  hosts: linux
+  become: true
+
+  tasks:
+    - name: Obtener nombre de usuario actual
+      ansible.builtin.shell:
+        cmd: whoami
+      register: current_user
+
+    - name: Crear archivo de texto
+      ansible.builtin.file:
+        path: "/var/www/pinga.txt"
+        state: touch
+      become: true
+
+    - name: Añadir texto al archivo
+      ansible.builtin.lineinfile:
+        path: "/var/www/pinga.txt"
+        line: "jfjdfjdkfkf"
+        create: yes
+      become: true

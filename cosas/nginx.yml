@@ -1,0 +1,26 @@
+---
+- name: Instalar Nginx y reemplazar archivo HTML
+  hosts: linux
+  become: yes
+
+  tasks:
+    - name: Instalar Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Eliminar contenido existente en /var/www/html
+      file:
+        path: /var/www/html/index.html
+        state: absent
+
+    - name: Descargar archivo HTML desde GitHub
+      get_url:
+        url: "https://raw.githubusercontent.com/diosgato/Web/main/index.html"
+        dest: /var/www/html/index.html
+
+    - name: Reiniciar servicio Nginx
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes

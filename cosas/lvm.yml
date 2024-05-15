@@ -1,0 +1,73 @@
+---
+- name: LVM Testing
+  hosts: all
+  become: true
+  gather_facts: False
+
+  vars_prompt:
+    - name: disk_device
+      prompt: "Enter the disk device (e.g., /dev/sdd): "
+      private: False
+    - name: vg_name
+      prompt: "Enter the Volume Group name: "
+      private: False
+    - name: lv_name
+      prompt: "Enter the Logical Volume name: "
+      private: False
+    - name: lv_size
+      prompt: "Enter the size of the Logical Volume (e.g., 1G): "
+      private: False
+    - name: part_end
+      prompt: "Enter the end size of the partition (e.g., 45GiB): "
+      private: False
+    - name: mount_path
+      prompt: "Enter the mount path for the Logical Volume (e.g., /mnt/mylv): "
+      private: False
+
+  tasks:
+    - name: Print input values
+      ansible.builtin.debug:
+        msg: |
+          Disk Device: {{ disk_device }}
+          Volume Group Name: {{ vg_name }}
+          Logical Volume Name: {{ lv_name }}
+          Logical Volume Size: {{ lv_size }}
+          Partition End Size: {{ part_end }}
+          Mount Path: {{ mount_path }}
+
+    - name: Partition the disk
+      community.general.parted:
+        device: "{{ disk_device }}"
+        number: 1
+        flags: [lvm]
+        state: present
+        part_end: "{{ part_end }}"
+
+    - name: Task for PV and VG
+      community.general.lvg:
+        vg: "{{ vg_name }}"
+        pvs: "{{ disk_device }}1"
+
+    - name: Create Logical Volume
+      community.general.lvol:
+        vg: "{{ vg_name }}"
+        lv: "{{ lv_name }}"
+        size: "{{ lv_size }}"
+
+    - name: Format the volume with ext4 fs
+      community.general.filesystem:
+        fstype: ext4
+        dev: "/dev/{{ vg_name }}/{{ lv_name }}"
+
+    - name: Create mount directory
+      ansible.builtin.file:
+        path: "{{ mount_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Mount the Logical Volume
+      ansible.posix.mount:
+        path: "{{ mount_path }}"
+        src: "/dev/{{ vg_name }}/{{ lv_name }}"
+        fstype: ext4
+        state: mounted

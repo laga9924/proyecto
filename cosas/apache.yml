@@ -1,0 +1,20 @@
+---
+- name: Instalar Apache en Ubuntu
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar Apache
+      apt:
+        name: apache2
+        state: present
+        
+    - name: Asegurarse de que Apache esté en ejecución y habilitado al inicio
+      service:
+        name: apache2
+        state: started
+        enabled: yes

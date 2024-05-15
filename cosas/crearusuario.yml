@@ -1,0 +1,35 @@
+---
+- name: Crear usuarios
+  hosts: all
+  become: yes
+  vars_prompt:
+    - name: username
+      prompt: "Introduzca el nombre de usuario para el nuevo usuario"
+    - name: password
+      prompt: "Introduzca la contraseña para el nuevo usuario"
+      private: yes
+    - name: group
+      prompt: "Introduzca el grupo para el nuevo usuario"
+    - name: user_home
+      prompt: "Introduzca el directorio personal para el nuevo usuario"
+  tasks:
+    - name: Crear grupo si no existe
+      group:
+        name: "{{ group }}"
+        state: present
+
+    - name: Crear usuario
+      user:
+        name: "{{ username }}"
+        password: "{{ password | password_hash('sha512') }}"
+        state: present
+        group: "{{ group }}"
+        home: "{{ user_home }}"
+
+    - name: Crear directorio personal si no existe
+      file:
+        path: "{{ user_home }}"
+        state: directory
+        owner: "{{ username }}"
+        group: "{{ group }}"
+        mode: "0755"

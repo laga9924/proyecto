@@ -1,0 +1,39 @@
+---
+- name: Install Python and Visual Studio Code on Ubuntu
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: Install prerequisites for add-apt-repository
+      apt:
+        name: software-properties-common
+        state: present
+
+    - name: Add deadsnakes PPA for latest Python versions
+      apt_repository:
+        repo: ppa:deadsnakes/ppa
+        state: present
+
+    - name: Install Python 3.x
+      apt:
+        name: python3
+        state: latest
+
+    - name: Add Microsoft GPG key
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+
+    - name: Add Microsoft repository
+      apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+        state: present
+
+    - name: Install Visual Studio Code
+      apt:
+        name: code
+        state: present

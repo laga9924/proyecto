@@ -1,0 +1,14 @@
+- name: Pedir usuarios
+  hosts: all
+  become: yes
+  vars_prompt:
+    - name: username
+      prompt: "Introduce el nombre del usuario a eliminar"
+      private: no
+
+  tasks:
+    - name: Eliminar el usuario
+      user:
+        name: "{{ username }}"
+        state: absent
+        remove: yes
